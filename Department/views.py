@@ -3,7 +3,8 @@ from django.http.response import Http404
 from rest_framework.views import APIView
 
 from Department.models import Students, Department
-from . serializers import DepartmentSerializer, DepartmentSummarySerializer, StudentAddSerializer, StudentSerializer
+from .serializers import DepartmentSerializer, DepartmentSummarySerializer, StudentAddSerializer, StudentSerializer, \
+    AddNestedStudentSerializer
 from rest_framework.response import Response
 
 from Department import serializers
@@ -62,22 +63,22 @@ class DepartmentAdd(APIView):
 
 
 class StudentInfo(APIView):
-    serializer_class = StudentAddSerializer
+    serializer_class = AddNestedStudentSerializer
 
     def get_object(self, pk):
         try:
             return Students.objects.get(pk=pk)
         except Students.DoesNotExist:
             raise Http404
-            
 
     def post(self,request):
         data = request.data
-        serializer = StudentAddSerializer(data=data)
+        serializer = AddNestedStudentSerializer(data=data)
         if serializer.is_valid():
             serializer.save()
             return Response({'status':'200'})
-
+        else:
+            return Response({'status': '400', 'errors': serializer.errors})
 
     def get(self, request, pk=None, format=None):
         if pk:
@@ -94,8 +95,7 @@ class StudentInfo(APIView):
     def put(self,request,pk,format=None):
         data = request.data
         student = Students.objects.get(pk=pk)
-        serializer = StudentSerializer(instance=student,data=request.data, partial=True)
-
+        serializer = AddNestedStudentSerializer(instance=student,data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
         serializer.save()
         response = Response()
@@ -122,7 +122,5 @@ class DepartmentSummary(APIView):
         departments = Department.objects.all().annotate(student_count=Count('students'))
         serializer = DepartmentSummarySerializer(departments,many=True)
 
-
-
         return Response({"status":"200","data":serializer.data})
-    
+

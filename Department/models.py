@@ -6,6 +6,7 @@ from django.db import models
 
 class Department(models.Model):
     id = models.AutoField(primary_key=True)
+    dept_id = models.IntegerField(unique=True)
     dept_name = models.CharField(max_length=100)
     dept_head = models.CharField(max_length=100)
 
@@ -15,6 +16,7 @@ class Department(models.Model):
 
 class Students(models.Model):
     id = models.AutoField(primary_key=True)
+    std_id = models.IntegerField(unique=True)
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
     department = models.ManyToManyField(Department,blank=True)
