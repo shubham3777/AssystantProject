@@ -61,8 +61,15 @@ class DepartmentAdd(APIView):
         return Response(res)
 
 
-class StudentAdd(APIView):
+class StudentInfo(APIView):
     serializer_class = StudentAddSerializer
+
+    def get_object(self, pk):
+        try:
+            return Students.objects.get(pk=pk)
+        except Students.DoesNotExist:
+            raise Http404
+            
 
     def post(self,request):
         data = request.data
@@ -71,15 +78,6 @@ class StudentAdd(APIView):
             serializer.save()
             return Response({'status':'200'})
 
-
-class StudentInfo(APIView):
-
-    def get_object(self, pk):
-        try:
-            return Students.objects.get(pk=pk)
-        except Students.DoesNotExist:
-            raise Http404
-            
 
     def get(self, request, pk=None, format=None):
         if pk:

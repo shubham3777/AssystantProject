@@ -22,12 +22,11 @@ class StudentAddSerializer(serializers.ModelSerializer):
 
 class StudentSerializer(serializers.ModelSerializer):
     full_name = serializers.SerializerMethodField()
-    department = DepartmentSerializer(many=True,read_only=True)
+    department = DepartmentSerializer(many=True)
 
     class Meta:
         model = Students
-        fields = ['id','first_name','full_name','department']
-    
+        fields = ['id','first_name','last_name','full_name','department']
 
     def get_full_name(self, obj):
         return '{} {}'.format(obj.first_name, obj.last_name)
