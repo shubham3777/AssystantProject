@@ -9,10 +9,25 @@ from rest_framework.response import Response
 
 from Department import serializers
 from django.db.models import Count
-
+from rest_framework.schemas import AutoSchema
+import coreapi
 # Create your views here.
 
+
+class TodoSchema(AutoSchema):
+    def get_manual_fields(self, path, method):
+        extra_fields = []
+        if method.lower() in ['post', 'put']:
+            extra_fields = [
+                coreapi.Field('Department   ')
+            ]   
+        manual_fields =  super().get_manual_fields(path, method)
+        return manual_fields + extra_fields
+
+
 class DepartmentAdd(APIView):
+
+    schema = TodoSchema()
 
     def get_object(self, pk):
         try:
@@ -31,11 +46,15 @@ class DepartmentAdd(APIView):
 
         return Response(serializer.data)
 
-    def post(self,request,format=None):
+    def post(self,request,*args, **kwargs):
         data = request.data
         serializer = DepartmentSerializer(data=data)
+        dept_name = request.data['dept_name']
+
         if serializer.is_valid():
+
             serializer.save()
+
             return Response({'status':'200'})
 
     def put(self,request,pk,format=None):
@@ -115,11 +134,11 @@ class StudentInfo(APIView):
         return Response(res)
 
 
-
 class DepartmentSummary(APIView):
 
     def get(self,request):
         departments = Department.objects.all().annotate(student_count=Count('students'))
+        # departments = Department.objects.values('dept_name').distinct()
         serializer = DepartmentSummarySerializer(departments,many=True)
 
         return Response({"status":"200","data":serializer.data})

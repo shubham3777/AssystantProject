@@ -5,7 +5,7 @@ from . import views
 
 urlpatterns = [
     path('department/',views.DepartmentAdd.as_view()),
-    path('department/<int:pk>/',views.DepartmentAdd.as_view()),
+    path('department//(?P<pk>\d+)$',views.DepartmentAdd.as_view()),
     path('student/',views.StudentInfo.as_view()),
 
     path('student/<int:pk>/',views.StudentInfo.as_view()),

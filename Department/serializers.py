@@ -15,6 +15,9 @@ class DepartmentSerializer(serializers.ModelSerializer):
         model = Department
         fields = ['id','dept_id','dept_name','dept_head']
 
+        def get_dept_name(self, obj):
+            return '{} {}'.format(obj.dept_name, "Department")
+
 
 class StudentAddSerializer(serializers.ModelSerializer):
 
@@ -29,7 +32,7 @@ class StudentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Students
-        fields = ['id','first_name','last_name','full_name','department']
+        fields = ['id','std_id','first_name','last_name','full_name','department']
 
     def get_full_name(self, obj):
         return '{} {}'.format(obj.first_name, obj.last_name)
@@ -62,10 +65,10 @@ class AddNestedStudentSerializer(serializers.ModelSerializer):
                 student.department.add(instance)
                 student.save()
             except IntegrityError:
+                student.delete()
                 raise ValidationError('Department Id already exist.')
         return student
 
-    
     def update(self,instance, validated_data):
 
         departments_data = validated_data.pop('department')
